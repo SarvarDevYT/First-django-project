@@ -22,7 +22,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Narxi (so'mda)")
     old_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True,
                                     verbose_name="Eski narxi (Chegirma uchun)")
-    image = models.ImageField(upload_to='products/', verbose_name="Asosiy rasm")
+    image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="Asosiy rasm")
 
     display_size = models.CharField(max_length=100, blank=True, null=True, verbose_name="Displey hajmi")
     processor = models.CharField(max_length=150, blank=True, null=True, verbose_name="Protsessor modeli")
@@ -85,3 +85,45 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.title}"
+
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending',    'Kutilmoqda'),
+        ('processing', 'Jarayonda'),
+        ('delivered',  'Yetkazildi'),
+        ('cancelled',  'Bekor qilindi'),
+    ]
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name="Foydalanuvchi")
+    total      = models.DecimalField(max_digits=14, decimal_places=2, verbose_name="Jami summa")
+    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Holati")
+    address    = models.TextField(blank=True, null=True, verbose_name="Yetkazish manzili")
+    note       = models.TextField(blank=True, null=True, verbose_name="Izoh")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Buyurtma vaqti")
+
+    class Meta:
+        verbose_name = "Buyurtma"
+        verbose_name_plural = "Buyurtmalar"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Buyurtma #{self.pk} — {self.user.username}"
+
+
+class OrderItem(models.Model):
+    order    = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name="Buyurtma")
+    product  = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, verbose_name="Mahsulot")
+    title    = models.CharField(max_length=255, verbose_name="Mahsulot nomi (snapshot)")
+    price    = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Narxi")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Soni")
+
+    class Meta:
+        verbose_name = "Buyurtma qatori"
+        verbose_name_plural = "Buyurtma qatorlari"
+
+    def __str__(self):
+        return f"{self.title} x{self.quantity}"
+
+    @property
+    def subtotal(self):
+        return self.price * self.quantity

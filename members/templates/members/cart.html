@@ -59,12 +59,19 @@
     </div>
 
     <!-- Footer -->
-    <div class="cart-footer">
-        <div>
-            <div style="font-size:14px; color:#8a8a8e; margin-bottom:4px;">Jami</div>
-            <div class="cart-total-label">Umumiy narx: {{ total|floatformat:0 }} so'm</div>
+    <div class="cart-footer" style="display:flex; flex-direction:column; gap:15px; align-items: stretch;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div style="font-size:14px; color:#8a8a8e; margin-bottom:4px;">Jami</div>
+                <div class="cart-total-label">Umumiy narx: {{ total|floatformat:0 }} so'm</div>
+            </div>
         </div>
-        <button class="btn-primary" id="checkout-btn">Xarid qilish</button>
+        <form method="post" action="{% url 'checkout' %}" style="display:flex; flex-direction:column; gap:10px;">
+            {% csrf_token %}
+            <input type="text" name="address" placeholder="Yetkazib berish manzili" required style="padding:12px; border-radius:8px; border:1px solid #444; background:#1c1c1e; color:#fff; width:100%; font-size:15px;">
+            <textarea name="note" placeholder="Qo'shimcha izoh (ixtiyoriy)" style="padding:12px; border-radius:8px; border:1px solid #444; background:#1c1c1e; color:#fff; width:100%; font-size:15px; resize:vertical; min-height:60px;"></textarea>
+            <button type="submit" class="btn-primary" style="width:100%; padding:14px; border-radius:12px; font-size:16px;">Xarid qilish</button>
+        </form>
     </div>
 
     {% else %}

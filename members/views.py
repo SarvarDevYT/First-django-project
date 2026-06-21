@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Product, Category, CartItem, Favorite, UserProfile
+from .models import Product, Category, CartItem, Favorite, UserProfile, Order, OrderItem
 
 
 # ─── Helper: context processor for sidebar counts ───────────────────────────
@@ -87,6 +87,58 @@ def remove_from_cart(request, item_id):
         item.delete()
         messages.success(request, 'Savatdan o\'chirildi.')
     return redirect('cart')
+
+
+@login_required(login_url='login')
+def checkout(request):
+    if request.method == 'POST':
+        cart_items = CartItem.objects.filter(user=request.user).select_related('product')
+        if not cart_items.exists():
+            messages.warning(request, 'Savat bo\'sh.')
+            return redirect('cart')
+
+        total = sum(item.product.price * item.quantity for item in cart_items)
+        address = request.POST.get('address', '').strip()
+        note = request.POST.get('note', '').strip()
+
+        # Buyurtma yaratish
+        order = Order.objects.create(
+            user=request.user,
+            total=total,
+            address=address,
+            note=note,
+        )
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                title=item.product.title,
+                price=item.product.price,
+                quantity=item.quantity,
+            )
+
+        # Savatni tozalash
+        cart_items.delete()
+        messages.success(request, f'Buyurtma #{order.pk} muvaffaqiyatli qabul qilindi!')
+        return redirect('order_success', pk=order.pk)
+
+    return redirect('cart')
+
+
+@login_required(login_url='login')
+def order_success(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user)
+    ctx = _base_context(request)
+    ctx['order'] = order
+    return render(request, 'members/order_success.html', ctx)
+
+
+@login_required(login_url='login')
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).prefetch_related('items')
+    ctx = _base_context(request)
+    ctx['orders'] = orders
+    return render(request, 'members/my_orders.html', ctx)
 
 
 # ─── Favorites ───────────────────────────────────────────────────────────────

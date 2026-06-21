@@ -60,20 +60,24 @@
     {% if trending_products %}
     <div class="products-grid">
         {% for product in trending_products %}
-        <a href="{% url 'product_detail' product.id %}" class="product-card" style="text-decoration:none; color:inherit; display:flex;">
-            <!-- Image -->
-            {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
-            {% else %}
-            <div class="product-card-img-placeholder">📦</div>
-            {% endif %}
+        <div class="product-card" style="display:flex;">
+            <!-- Image — click goes to detail -->
+            <a href="{% url 'product_detail' product.id %}" style="flex-shrink:0; display:block;">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
+                {% else %}
+                <div class="product-card-img-placeholder">📦</div>
+                {% endif %}
+            </a>
 
             <!-- Info -->
             <div class="product-card-info">
-                <div class="product-card-title">{{ product.title }}</div>
-                <div class="product-card-subtitle">
-                    {{ product.vendor|default:"" }}{% if product.internal_memory %} · {{ product.internal_memory }}{% endif %}
-                </div>
+                <a href="{% url 'product_detail' product.id %}" style="text-decoration:none; color:inherit;">
+                    <div class="product-card-title">{{ product.title }}</div>
+                    <div class="product-card-subtitle">
+                        {{ product.vendor|default:"" }}{% if product.internal_memory %} · {{ product.internal_memory }}{% endif %}
+                    </div>
+                </a>
 
                 <!-- Colors -->
                 {% if product.color %}
@@ -102,7 +106,7 @@
                         {% endif %}
                         <div class="product-price-main">{{ product.price|floatformat:0 }} so'm</div>
                     </div>
-                    <div class="card-actions" onclick="event.preventDefault();">
+                    <div class="card-actions">
                         <form method="post" action="{% url 'add_to_cart' product.id %}" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="icon-btn" title="Savatga qo'shish">
@@ -124,7 +128,7 @@
                     </div>
                 </div>
             </div>
-        </a>
+        </div>
         {% endfor %}
     </div>
 
@@ -150,15 +154,20 @@
         <!-- Product Cards Row -->
         <div class="category-products-row">
             {% for product in cat.products.all|slice:":6" %}
-            <a href="{% url 'product_detail' product.id %}" class="product-card cat-product-card" style="text-decoration:none; color:inherit;">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
-                {% else %}
-                <div class="product-card-img-placeholder">📦</div>
-                {% endif %}
+            <div class="product-card cat-product-card">
+                <!-- Image -->
+                <a href="{% url 'product_detail' product.id %}" style="display:block; flex-shrink:0;">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
+                    {% else %}
+                    <div class="product-card-img-placeholder">📦</div>
+                    {% endif %}
+                </a>
                 <div class="product-card-info">
-                    <div class="product-card-title">{{ product.title }}</div>
-                    <div class="product-card-subtitle">{{ product.vendor|default:"" }}</div>
+                    <a href="{% url 'product_detail' product.id %}" style="text-decoration:none; color:inherit;">
+                        <div class="product-card-title">{{ product.title }}</div>
+                        <div class="product-card-subtitle">{{ product.vendor|default:"" }}</div>
+                    </a>
 
                     <!-- Colors mock -->
                     <div class="product-colors" style="margin-bottom:8px;">
@@ -174,7 +183,7 @@
 
                     <div class="product-card-bottom">
                         <div class="product-price-main">{{ product.price|floatformat:0 }} so'm</div>
-                        <div class="card-actions" onclick="event.preventDefault();">
+                        <div class="card-actions">
                             <form method="post" action="{% url 'add_to_cart' product.id %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="icon-btn" title="Savatga">
@@ -196,7 +205,7 @@
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
             {% endfor %}
         </div>
 

@@ -1,0 +1,57 @@
+{% extends 'members/base.html' %}
+{% load static %}
+
+{% block title %}Mening buyurtmalarim — iSpace{% endblock %}
+
+{% block content %}
+<div style="max-width:800px; margin:40px auto; padding:0 20px;">
+    <h1 style="margin-bottom:30px; color:#fff;">Mening buyurtmalarim</h1>
+
+    {% if orders %}
+    <div style="display:flex; flex-direction:column; gap:20px;">
+        {% for order in orders %}
+        <div style="background:#1c1c1e; border-radius:16px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:15px;">
+                <div>
+                    <div style="font-size:18px; font-weight:bold; color:#fff;">Buyurtma #{{ order.pk }}</div>
+                    <div style="color:#8a8a8e; font-size:14px;">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="status-badge 
+                        {% if order.status == 'pending' %}badge-orange
+                        {% elif order.status == 'delivered' %}badge-green
+                        {% else %}badge-gray{% endif %}" style="display:inline-block; margin-bottom:5px;">
+                        {{ order.get_status_display }}
+                    </span>
+                    <div style="font-weight:bold; color:#fff;">{{ order.total|floatformat:0 }} so'm</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <div style="color:#8a8a8e; font-size:14px; margin-bottom:4px;">Yetkazish manzili:</div>
+                <div style="color:#fff;">{{ order.address }}</div>
+            </div>
+
+            <div>
+                <div style="color:#8a8a8e; font-size:14px; margin-bottom:8px;">Mahsulotlar:</div>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">
+                    {% for item in order.items.all %}
+                    <li style="display:flex; justify-content:space-between; color:#ccc; font-size:15px; background:#2c2c2e; padding:10px; border-radius:8px;">
+                        <span>{{ item.title }} <span style="color:#8a8a8e;">x {{ item.quantity }}</span></span>
+                        <span>{{ item.subtotal|floatformat:0 }} so'm</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <p>Hozircha buyurtmalar yo'q.</p>
+        <a href="{% url 'members_list' %}" style="display:inline-block; margin-top:20px; background:#1a1a1a; color:white; padding:12px 30px; border-radius:14px; font-weight:600; font-size:15px; text-decoration:none;">Do'konga o'tish</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

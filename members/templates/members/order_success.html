@@ -1,0 +1,38 @@
+{% extends 'members/base.html' %}
+{% load static %}
+
+{% block title %}Buyurtma qabul qilindi — iSpace{% endblock %}
+
+{% block content %}
+<div style="max-width:600px; margin:40px auto; text-align:center; padding:20px;">
+    <div style="font-size:60px; margin-bottom:20px;">✅</div>
+    <h1 style="margin-bottom:10px; color:#fff;">Xaridingiz uchun rahmat!</h1>
+    <p style="color:#8a8a8e; margin-bottom:30px;">
+        Buyurtma #{{ order.pk }} muvaffaqiyatli qabul qilindi. 
+        Tez orada operatorlarimiz siz bilan bog'lanishadi.
+    </p>
+
+    <div style="background:#1c1c1e; padding:20px; border-radius:16px; text-align:left; margin-bottom:30px;">
+        <h3 style="margin-bottom:15px; color:#fff;">Buyurtma tafsilotlari</h3>
+        <p style="color:#8a8a8e; margin-bottom:5px;"><strong>Manzil:</strong> <span style="color:#fff;">{{ order.address }}</span></p>
+        {% if order.note %}
+        <p style="color:#8a8a8e; margin-bottom:5px;"><strong>Izoh:</strong> <span style="color:#fff;">{{ order.note }}</span></p>
+        {% endif %}
+        <p style="color:#8a8a8e; margin-bottom:15px;"><strong>Umumiy summa:</strong> <span style="color:#fff;">{{ order.total|floatformat:0 }} so'm</span></p>
+
+        <h4 style="margin-bottom:10px; color:#fff;">Mahsulotlar:</h4>
+        <ul style="list-style:none; padding:0; margin:0; color:#ccc;">
+            {% for item in order.items.all %}
+            <li style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #333;">
+                {{ item.title }} x {{ item.quantity }} — {{ item.subtotal|floatformat:0 }} so'm
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div style="display:flex; gap:15px; justify-content:center;">
+        <a href="{% url 'members_list' %}" class="btn-primary" style="text-decoration:none;">Bosh sahifa</a>
+        <a href="{% url 'my_orders' %}" style="display:inline-block; background:#333; color:white; padding:12px 24px; border-radius:12px; text-decoration:none; font-weight:600;">Buyurtmalarim</a>
+    </div>
+</div>
+{% endblock %}
