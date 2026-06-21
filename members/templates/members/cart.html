@@ -1,0 +1,81 @@
+{% extends 'members/base.html' %}
+{% load static %}
+
+{% block title %}Savat — iSpace{% endblock %}
+
+{% block content %}
+
+<!-- Search -->
+<div class="search-wrapper">
+    <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="Search" id="cart-search">
+        <button class="search-filter-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<div class="cart-page-wrapper">
+
+    {% if cart_items %}
+    <div class="cart-items-list">
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <!-- Image -->
+            {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="cart-item-img">
+            {% else %}
+            <div class="cart-item-img" style="background:#f0f0f0; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:28px;">📦</div>
+            {% endif %}
+
+            <!-- Info -->
+            <div class="cart-item-info">
+                <div class="cart-item-title">{{ item.product.title }}</div>
+                <div class="cart-item-subtitle">
+                    {{ item.product.vendor|default:"" }}
+                    {% if item.quantity > 1 %} · {{ item.quantity }} ta{% endif %}
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="cart-item-price">{{ item.product.price|floatformat:0 }} so'm</div>
+
+            <!-- Checkbox / Remove -->
+            <form method="post" action="{% url 'remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button type="submit" class="cart-checkbox checked" title="O'chirish">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <div class="cart-footer">
+        <div>
+            <div style="font-size:14px; color:#8a8a8e; margin-bottom:4px;">Jami</div>
+            <div class="cart-total-label">Umumiy narx: {{ total|floatformat:0 }} so'm</div>
+        </div>
+        <button class="btn-primary" id="checkout-btn">Xarid qilish</button>
+    </div>
+
+    {% else %}
+    <!-- Empty cart -->
+    <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <p>Savat bo'sh. Mahsulot qo'shing!</p>
+        <a href="{% url 'members_list' %}" style="display:inline-block; margin-top:20px; background:#1a1a1a; color:white; padding:12px 30px; border-radius:14px; font-weight:600; font-size:15px;">Do'konga o'tish</a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

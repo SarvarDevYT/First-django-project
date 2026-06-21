@@ -1,0 +1,41 @@
+{% extends 'members/base.html' %}
+{% block title %}Kontaktlar — iSpace{% endblock %}
+{% block content %}
+<div style="max-width:700px; margin:60px auto; padding:0 28px;">
+    <h1 style="font-size:40px; font-weight:800; margin-bottom:8px; letter-spacing:-1px;">Kontaktlar</h1>
+    <p style="color:#8a8a8e; font-size:15px; margin-bottom:40px;">Biz bilan bog'laning. 24/7 yordam ko'rsatamiz.</p>
+
+    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:40px;">
+        <div style="background:#f5f5f7; border-radius:16px; padding:20px 24px; display:flex; align-items:center; gap:16px;">
+            <div style="font-size:24px;">📞</div>
+            <div>
+                <div style="font-size:12px; color:#8a8a8e; font-weight:500; margin-bottom:2px;">Telefon</div>
+                <div style="font-size:17px; font-weight:700;">+998 71 200 20 20</div>
+            </div>
+        </div>
+        <div style="background:#f5f5f7; border-radius:16px; padding:20px 24px; display:flex; align-items:center; gap:16px;">
+            <div style="font-size:24px;">✉️</div>
+            <div>
+                <div style="font-size:12px; color:#8a8a8e; font-weight:500; margin-bottom:2px;">Email</div>
+                <div style="font-size:17px; font-weight:700;">info@ispace.uz</div>
+            </div>
+        </div>
+        <div style="background:#f5f5f7; border-radius:16px; padding:20px 24px; display:flex; align-items:center; gap:16px;">
+            <div style="font-size:24px;">📍</div>
+            <div>
+                <div style="font-size:12px; color:#8a8a8e; font-weight:500; margin-bottom:2px;">Manzil</div>
+                <div style="font-size:17px; font-weight:700;">Toshkent, O'zbekiston</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact form -->
+    <form style="display:flex; flex-direction:column; gap:14px;">
+        {% csrf_token %}
+        <input type="text" placeholder="Ismingiz" style="background:#f0f0f0; border-radius:14px; padding:16px 20px; font-size:15px; font-family:'Inter',sans-serif; border:none; outline:none;">
+        <input type="email" placeholder="Email" style="background:#f0f0f0; border-radius:14px; padding:16px 20px; font-size:15px; font-family:'Inter',sans-serif; border:none; outline:none;">
+        <textarea placeholder="Xabar" rows="4" style="background:#f0f0f0; border-radius:14px; padding:16px 20px; font-size:15px; font-family:'Inter',sans-serif; border:none; outline:none; resize:none;"></textarea>
+        <button type="submit" class="btn-primary" style="width:fit-content;">Yuborish</button>
+    </form>
+</div>
+{% endblock %}

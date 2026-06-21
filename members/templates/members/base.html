@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="iSpace — Uzbekistondagi eng yaxshi elektronika do'koni. iPhone, Mac, iPad va boshqa gadjetlar.">
+    <title>{% block title %}iSpace — Elektronika va Gadjetlar{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'members/css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="{% url 'members_list' %}" class="logo">iSpace</a>
+            <a href="{% url 'members_list' %}" class="nav-katalog-btn">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="10" y="1" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="1" y="10" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="10" y="10" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+                </svg>
+                Katalog
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'about' %}">Biz haqimizda</a>
+                <a href="{% url 'contact' %}">Kontaktlar</a>
+                <div class="lang-selector">
+                    <span>🇺🇿</span>
+                    <span>O'zbek</span>
+                    <span style="font-size:10px; opacity:0.6">∨</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===== MESSAGES ===== -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ===== FLOATING SIDEBAR ===== -->
+    <div class="floating-sidebar" id="floatingSidebar">
+
+        <!-- Wishlist -->
+        <a href="{% url 'favorites' %}" class="sidebar-row" id="sb-wishlist">
+            <div class="sidebar-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                {% if favorites_count and favorites_count > 0 %}
+                <span class="sidebar-badge badge-red">{{ favorites_count }}</span>
+                {% endif %}
+            </div>
+            <span class="sidebar-label">Wishlist</span>
+        </a>
+
+        <!-- Cart -->
+        <a href="{% url 'cart' %}" class="sidebar-row" id="sb-cart">
+            <div class="sidebar-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                {% if cart_count and cart_count > 0 %}
+                <span class="sidebar-badge badge-blue">{{ cart_count }}</span>
+                {% endif %}
+            </div>
+            <span class="sidebar-label">Cart</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- Profile / Login -->
+        {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="sidebar-row" id="sb-profile">
+            <div class="sidebar-icon-wrap" style="padding:0;">
+                {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" class="sidebar-avatar-img" alt="{{ user.get_full_name|default:user.username }}">
+                {% else %}
+                <div class="sidebar-avatar-placeholder">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                {% endif %}
+            </div>
+            <span class="sidebar-label">{{ user.first_name|default:user.username }}</span>
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="sidebar-row" id="sb-profile">
+            <div class="sidebar-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            <span class="sidebar-label">Kirish</span>
+        </a>
+        {% endif %}
+
+        <!-- Dark / Light mode -->
+        <div class="sidebar-darkmode-row" id="sb-darkmode" onclick="toggleDarkMode()">
+            <div class="sidebar-icon-wrap">
+                <svg id="dark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                </svg>
+            </div>
+            <span class="sidebar-label" style="color:var(--black); font-weight:600; font-size:13px;" id="darkmode-label">Light</span>
+            <div class="dark-toggle-track" style="margin-left:auto; flex-shrink:0;">
+                <div class="dark-toggle-thumb"></div>
+            </div>
+        </div>
+
+        <!-- Collapse / Expand button -->
+        <button class="sidebar-toggle-btn" id="sb-toggle" onclick="toggleSidebar()" title="Kengaytirish/yiqish" style="margin-top:4px;">
+            <svg id="sb-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+        </button>
+
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    {% block content %}{% endblock %}
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-logo">iSpace</div>
+                <div class="footer-socials">
+                    <a href="#" class="footer-social-link" title="Instagram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="footer-social-link" title="Telegram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.018 9.51c-.148.668-.542.832-1.099.517l-3.047-2.244-1.47 1.413c-.162.162-.3.3-.616.3l.22-3.1 5.652-5.107c.246-.22-.053-.34-.381-.12L7.37 14.697l-3.003-.938c-.653-.204-.666-.653.136-.967l11.715-4.517c.544-.196 1.02.133.844.973z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="footer-social-link" title="Facebook">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-lang">
+                    <span>🇺🇿</span>
+                    <span>O'zbek</span>
+                    <span style="font-size:10px; opacity:0.6">∨</span>
+                </div>
+                <div class="footer-email-form">
+                    <input type="email" placeholder="Email">
+                    <button class="footer-email-btn">→</button>
+                </div>
+                <div class="footer-links">
+                    <a href="{% url 'about' %}">Biz haqimizda</a>
+                    <a href="{% url 'contact' %}">Kontaktlar</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- ===== GLOBAL SCRIPTS ===== -->
+    <script>
+    /* ---------- DARK MODE ---------- */
+    const DARK_KEY = 'ispace-dark';
+
+    function applyDarkMode(isDark) {
+        document.body.classList.toggle('dark-mode', isDark);
+        const label = document.getElementById('darkmode-label');
+        const icon  = document.getElementById('dark-icon');
+        if (label) label.textContent = isDark ? 'Dark' : 'Light';
+        if (icon) {
+            icon.innerHTML = isDark
+                ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+                : '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>';
+        }
+    }
+
+    function toggleDarkMode() {
+        const isDark = !document.body.classList.contains('dark-mode');
+        localStorage.setItem(DARK_KEY, isDark ? '1' : '0');
+        applyDarkMode(isDark);
+    }
+
+    // Apply on load
+    (function () {
+        const saved = localStorage.getItem(DARK_KEY);
+        if (saved === '1') applyDarkMode(true);
+    })();
+
+    /* ---------- SIDEBAR TOGGLE ---------- */
+    const SIDEBAR_KEY = 'ispace-sidebar-open';
+
+    function toggleSidebar() {
+        const sb   = document.getElementById('floatingSidebar');
+        const icon = document.getElementById('sb-toggle-icon');
+        const isOpen = sb.classList.toggle('expanded');
+        localStorage.setItem(SIDEBAR_KEY, isOpen ? '1' : '0');
+        // Rotate arrow
+        if (icon) {
+            icon.innerHTML = isOpen
+                ? '<polyline points="9 18 15 12 9 6"/>'   // arrow right (collapse)
+                : '<polyline points="15 18 9 12 15 6"/>'; // arrow left  (expand)
+        }
+    }
+
+    // Restore sidebar state
+    (function () {
+        const saved = localStorage.getItem(SIDEBAR_KEY);
+        if (saved === '1') {
+            const sb   = document.getElementById('floatingSidebar');
+            const icon = document.getElementById('sb-toggle-icon');
+            if (sb) sb.classList.add('expanded');
+            if (icon) icon.innerHTML = '<polyline points="9 18 15 12 9 6"/>';
+        }
+    })();
+
+    /* ---------- AUTO DISMISS MESSAGES ---------- */
+    setTimeout(function () {
+        const msgs = document.querySelector('.messages-container');
+        if (msgs) {
+            msgs.style.transition = 'opacity 0.5s';
+            msgs.style.opacity = '0';
+            setTimeout(() => msgs.remove(), 500);
+        }
+    }, 4000);
+    </script>
+</body>
+</html>

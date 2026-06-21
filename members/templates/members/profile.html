@@ -1,0 +1,97 @@
+{% extends 'members/base.html' %}
+{% load static %}
+
+{% block title %}Profilim — iSpace{% endblock %}
+
+{% block content %}
+<div class="profile-page-wrapper">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar-circle">
+            {% if user.is_authenticated and user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}" class="profile-avatar-img">
+            {% else %}
+            <div class="profile-avatar-svg">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.5">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+            </div>
+            {% endif %}
+        </div>
+        <div>
+            <div class="profile-name">
+                {% if user.is_authenticated %}
+                    {{ user.first_name }} {{ user.last_name }}
+                {% else %}
+                    Mehmon
+                {% endif %}
+            </div>
+            <div class="profile-meta">
+                {% if user.is_authenticated %}
+                    email: {{ user.email }}<br>
+                    {% if user.profile.phone %}Telefon raqam: {{ user.profile.phone }}{% endif %}
+                {% else %}
+                    Kirish yoki ro'yxatdan o'ting
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Menu -->
+    {% if user.is_authenticated %}
+    <div class="profile-menu">
+        <a href="{% url 'cart' %}" class="profile-menu-item">
+            <div class="profile-menu-icon">🛒</div>
+            Buyurtmalarim
+        </a>
+        <a href="{% url 'favorites' %}" class="profile-menu-item">
+            <div class="profile-menu-icon">❤️</div>
+            Sevimlilar
+        </a>
+        <a href="{% url 'edit_profile' %}" class="profile-menu-item">
+            <div class="profile-menu-icon">👤</div>
+            Hisobni tahrirlash
+        </a>
+        <a href="{% url 'logout' %}" class="profile-menu-item" style="color:#e84040;">
+            <div class="profile-menu-icon">🚪</div>
+            Chiqish
+        </a>
+    </div>
+
+    <!-- Recommendations -->
+    <h2 class="section-title">Tavsiyalar</h2>
+    {% if recommended %}
+    <div class="products-grid">
+        {% for product in recommended %}
+        <a href="{% url 'product_detail' product.id %}" class="product-card" style="text-decoration:none; color:inherit; display:flex;">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
+            {% else %}
+            <div class="product-card-img-placeholder">📦</div>
+            {% endif %}
+            <div class="product-card-info">
+                <div class="product-card-title">{{ product.title }}</div>
+                <div class="product-card-subtitle">{{ product.vendor|default:"" }}</div>
+                <div class="product-card-bottom">
+                    <div class="product-price-main">{{ product.price|floatformat:0 }} so'm</div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:#8a8a8e; font-size:14px;">Hozircha tavsiyalar yo'q.</p>
+    {% endif %}
+
+    {% else %}
+    <!-- Not logged in -->
+    <div style="display:flex; flex-direction:column; gap:16px; max-width:400px;">
+        <a href="{% url 'login' %}" class="btn-primary" style="text-align:center; display:block; text-decoration:none;">Kirish</a>
+        <a href="{% url 'login' %}" style="text-align:center; font-size:14px; color:#8a8a8e; font-weight:500; padding:14px; border:1.5px solid #e5e5e5; border-radius:14px; display:block;">Ro'yxatdan o'tish</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'members/base.html' %}
+{% load static %}
+
+{% block title %}Sevimlilar — iSpace{% endblock %}
+
+{% block content %}
+
+<!-- Search -->
+<div class="search-wrapper">
+    <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="Search" id="fav-search">
+        <button class="search-filter-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<div class="cart-page-wrapper">
+
+    {% if favorites %}
+    <div class="cart-items-list favorites-item">
+        {% for fav in favorites %}
+        <div class="cart-item">
+            <!-- Image -->
+            {% if fav.product.image %}
+            <img src="{{ fav.product.image.url }}" alt="{{ fav.product.title }}" class="cart-item-img">
+            {% else %}
+            <div class="cart-item-img" style="background:#f0f0f0; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:28px;">📦</div>
+            {% endif %}
+
+            <!-- Info -->
+            <div class="cart-item-info">
+                <div class="cart-item-title">{{ fav.product.title }}</div>
+                <div class="cart-item-subtitle">{{ fav.product.vendor|default:"" }}</div>
+            </div>
+
+            <!-- Price -->
+            <div class="cart-item-price">{{ fav.product.price|floatformat:0 }} so'm</div>
+
+            <!-- Remove from favorites -->
+            <form method="post" action="{% url 'toggle_favorite' fav.product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="icon-btn heart-active" title="Sevimlidan olib tashlash" style="width:36px; height:36px; background:#ffeaea;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">❤️</div>
+        <p>Sevimlilarga hech narsa qo'shilmagan.</p>
+        <a href="{% url 'members_list' %}" style="display:inline-block; margin-top:20px; background:#1a1a1a; color:white; padding:12px 30px; border-radius:14px; font-weight:600; font-size:15px;">Mahsulotlarga qaytish</a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

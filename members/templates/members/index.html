@@ -1,47 +1,209 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>iSpace - Mahsulotlar Katalogi</title>
-</head>
-<body>
+{% extends 'members/base.html' %}
+{% load static %}
 
-    <h1>iSpace Internet Do'koni - Mahsulotlar Ro'yxati</h1>
+{% block title %}iSpace — Elektronika va Gadjetlar{% endblock %}
 
-    <table border="1" cellpadding="10" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Rasm</th>
-                <th>Mahsulot Nomi</th>
-                <th>Brend (Vendor)</th>
-                <th>Narxi (so'm)</th>
-                <th>Eski Narxi</th>
-                <th>Displey</th>
-                <th>Protsessor</th>
-                <th>Xotira</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for x in products %}
-            <tr>
-                <td>
-                    {% if x.image %}
-                        <img src="{{ x.image.url }}" width="100">
+{% block content %}
+
+<!-- ===== SEARCH BAR ===== -->
+<div class="search-wrapper">
+    <form method="get" action="" class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}" id="search-input">
+        <button type="button" class="search-filter-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+                <line x1="11" y1="18" x2="13" y2="18" />
+            </svg>
+        </button>
+    </form>
+</div>
+
+<!-- ===== CATEGORY TABS ===== -->
+<div class="category-tabs">
+    <a href="?" class="cat-tab {% if not active_category %}active{% endif %}">All</a>
+    {% for cat in categories %}
+    <a href="?cat={{ cat.slug }}" class="cat-tab {% if active_category == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+    {% endfor %}
+</div>
+
+<!-- ===== HERO SECTION ===== -->
+<div class="hero-section">
+    <!-- Hero Left -->
+    <div class="hero-left">
+        <div class="hero-promo-label">Sotuvda 6-oktyabrdan</div>
+        <div class="hero-price">18 254 000 <span>so'mdan boshlanadi</span></div>
+        <div class="hero-bonus">+ Beelinedan <b>15GB</b> -dan 3 oy</div>
+        <div class="hero-brand">iSpace</div>
+        <a href="{% url 'members_list' %}" class="hero-buy-btn">Sotib olish</a>
+        <div class="hero-note">*Bonusni Beeline ilovasi orqali ulash mumkin.</div>
+    </div>
+
+    <!-- Hero Right -->
+    <div class="hero-right" style="position: relative; overflow: hidden; padding: 0;">
+        <!-- Top-left label -->
+        <div class="hero-right-text" style="position: absolute; top: 30px; left: 30px; z-index: 2; margin: 0;">Yangi</div>
+
+        <!-- iPhone 15 Pro — Full-cover card image containing phone and Titan text -->
+        <img src="{% static 'members/img/iphone15-hero.png' %}" alt="iPhone 15 Pro" class="hero-phone-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+    </div>
+</div>
+
+<!-- ===== TRENDING ITEMS ===== -->
+<div class="main-content">
+    <h1 class="section-title">Trending Items</h1>
+
+    {% if trending_products %}
+    <div class="products-grid">
+        {% for product in trending_products %}
+        <a href="{% url 'product_detail' product.id %}" class="product-card" style="text-decoration:none; color:inherit; display:flex;">
+            <!-- Image -->
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
+            {% else %}
+            <div class="product-card-img-placeholder">📦</div>
+            {% endif %}
+
+            <!-- Info -->
+            <div class="product-card-info">
+                <div class="product-card-title">{{ product.title }}</div>
+                <div class="product-card-subtitle">
+                    {{ product.vendor|default:"" }}{% if product.internal_memory %} · {{ product.internal_memory }}{% endif %}
+                </div>
+
+                <!-- Colors -->
+                {% if product.color %}
+                <div class="product-colors">
+                    <span style="font-size:11px; color:var(--gray-text);">Colors</span>
+                    <span class="color-dot" style="background:#1a1a1a;"></span>
+                    <span class="color-dot" style="background:#c8c8c8;"></span>
+                    <span class="color-dot" style="background:#e5c590;"></span>
+                </div>
+                {% endif %}
+
+                <!-- Status Badge -->
+                <div style="margin-bottom:8px;">
+                    {% if product.old_price %}
+                    <span class="status-badge badge-orange">Chegirma</span>
                     {% else %}
-                        Rasm yuklanmagan
+                    <span class="status-badge badge-green">Avail.</span>
                     {% endif %}
-                </td>
+                </div>
 
-                <td>{{ x.title }}</td>
-                <td>{{ x.vendor }}</td>
-                <td>{{ x.price }}</td>
-                <td>{{ x.old_price }}</td>
-                <td>{{ x.display_size }}</td>
-                <td>{{ x.processor }}</td>
-                <td>{{ x.internal_memory }}</td>
-            </tr>
+                <!-- Price + Actions -->
+                <div class="product-card-bottom">
+                    <div>
+                        {% if product.old_price %}
+                        <div class="product-price-old">{{ product.old_price|floatformat:0 }} so'm</div>
+                        {% endif %}
+                        <div class="product-price-main">{{ product.price|floatformat:0 }} so'm</div>
+                    </div>
+                    <div class="card-actions" onclick="event.preventDefault();">
+                        <form method="post" action="{% url 'add_to_cart' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="icon-btn" title="Savatga qo'shish">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <circle cx="9" cy="21" r="1" />
+                                    <circle cx="20" cy="21" r="1" />
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                                </svg>
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'toggle_favorite' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="icon-btn {% if product.id in favorite_ids %}heart-active{% endif %}" title="Sevimlilarga">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="{% if product.id in favorite_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <p>Hozircha mahsulot yo'q. Admin paneldan qo'shing.</p>
+    </div>
+    {% endif %}
+
+    <!-- ===== CATEGORY SECTION ===== -->
+    {% for cat in categories %}
+    {% if cat.products.all %}
+    <div class="category-section">
+
+        <!-- Section Header -->
+        <div class="category-section-header">
+            <div class="category-section-title">{{ cat.name }}</div>
+            <a href="?cat={{ cat.slug }}" class="category-see-all">Barchasini ko'rish →</a>
+        </div>
+
+        <!-- Product Cards Row -->
+        <div class="category-products-row">
+            {% for product in cat.products.all|slice:":6" %}
+            <a href="{% url 'product_detail' product.id %}" class="product-card cat-product-card" style="text-decoration:none; color:inherit;">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
+                {% else %}
+                <div class="product-card-img-placeholder">📦</div>
+                {% endif %}
+                <div class="product-card-info">
+                    <div class="product-card-title">{{ product.title }}</div>
+                    <div class="product-card-subtitle">{{ product.vendor|default:"" }}</div>
+
+                    <!-- Colors mock -->
+                    <div class="product-colors" style="margin-bottom:8px;">
+                        <span style="font-size:12px; color:var(--gray-text); margin-right:6px;">Colors</span>
+                        <span class="color-dot" style="background:#ccc;"></span>
+                        <span class="color-dot" style="background:#1a1a1a;"></span>
+                        <span class="color-dot" style="background:#c0392b;"></span>
+                    </div>
+
+                    <div style="margin-bottom:8px;">
+                        <span class="status-badge badge-green">Avail.</span>
+                    </div>
+
+                    <div class="product-card-bottom">
+                        <div class="product-price-main">{{ product.price|floatformat:0 }} so'm</div>
+                        <div class="card-actions" onclick="event.preventDefault();">
+                            <form method="post" action="{% url 'add_to_cart' product.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="icon-btn" title="Savatga">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <circle cx="9" cy="21" r="1" />
+                                        <circle cx="20" cy="21" r="1" />
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                                    </svg>
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'toggle_favorite' product.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="icon-btn {% if product.id in favorite_ids %}heart-active{% endif %}" title="Sevimli">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="{% if product.id in favorite_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </a>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
 
-</body>
-</html>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+</div>
+
+{% endblock %}
